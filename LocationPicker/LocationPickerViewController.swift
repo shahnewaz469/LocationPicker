@@ -44,6 +44,8 @@ open class LocationPickerViewController: UIViewController {
     /// default: "Select"
     public var selectButtonTitle = "Select"
 	
+    public var searchBarTintColor: UIColor?
+
 	lazy public var currentLocationButtonBackground: UIColor = {
 		if let navigationBar = self.navigationController?.navigationBar,
 			let barTintColor = navigationBar.barTintColor {
@@ -85,7 +87,7 @@ open class LocationPickerViewController: UIViewController {
 	var currentLocationListeners: [CurrentLocationListener] = []
 	
 	var mapView: MKMapView!
-	var locationButton: UIButton?
+//    var locationButton: UIButton?
 	
 	lazy var results: LocationSearchResultsViewController = {
 		let results = LocationSearchResultsViewController()
@@ -105,6 +107,17 @@ open class LocationPickerViewController: UIViewController {
 		let searchBar = self.searchController.searchBar
 		searchBar.searchBarStyle = self.searchBarStyle
 		searchBar.placeholder = self.searchBarPlaceholder
+        if let tint = self.searchBarTintColor {
+            searchBar.tintColor = tint
+        }
+//        let clrChange = searchBar.subviews.flatMap { $0.subviews }
+//        if let sc = (clrChange.filter { $0 is UITextField }).first as? UITextField {
+//            sc.textColor = UIColor.red
+//        }
+//
+//        if let textFieldInsideSearchBar = searchBar.value(forKey: "searchField") as? UITextField {
+//            textFieldInsideSearchBar.textColor = UIColor.red
+//        }
 		return searchBar
 	}()
 	
@@ -128,16 +141,29 @@ open class LocationPickerViewController: UIViewController {
 			button.layer.cornerRadius = 16
 			let bundle = Bundle(for: LocationPickerViewController.self)
 			button.setImage(UIImage(named: "geolocation", in: bundle, compatibleWith: nil), for: UIControl.State())
-			button.addTarget(self, action: #selector(LocationPickerViewController.currentLocationPressed),
-			                 for: .touchUpInside)
+			button.addTarget(self, action: #selector(LocationPickerViewController.currentLocationPressed), for: .touchUpInside)
 			view.addSubview(button)
-			locationButton = button
-		}
+//            locationButton = button
+            
+            button.translatesAutoresizingMaskIntoConstraints = false
+            let horizontalConstraint = NSLayoutConstraint(item: button, attribute: .trailing, relatedBy: .equal, toItem: view, attribute: .trailing, multiplier: 1, constant: -20)
+            let verticalConstraint = NSLayoutConstraint(item: button, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: -20)
+            let widthConstraint = NSLayoutConstraint(item: button, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 32)
+            let heightConstraint = NSLayoutConstraint(item: button, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 1, constant: 32)
+            NSLayoutConstraint.activate([horizontalConstraint, verticalConstraint, widthConstraint, heightConstraint])
+            
+        }
 	}
 	
 	open override func viewDidLoad() {
 		super.viewDidLoad()
 		
+//        let clrChange = self.searchController.searchBar.subviews.flatMap { $0.subviews }
+//        if let sc = (clrChange.filter { $0 is UITextField }).first as? UITextField {
+//            sc.textColor = UIColor.red
+//            sc.text = "searchController"
+//        }
+        
 		locationManager.delegate = self
 		mapView.delegate = self
 		searchBar.delegate = self
@@ -173,12 +199,12 @@ open class LocationPickerViewController: UIViewController {
 	
 	open override func viewDidLayoutSubviews() {
 		super.viewDidLayoutSubviews()
-		if let button = locationButton {
-			button.frame.origin = CGPoint(
-				x: view.frame.width - button.frame.width - 16,
-				y: view.frame.height - button.frame.height - 20
-			)
-		}
+//        if let button = locationButton {
+//            button.frame.origin = CGPoint(
+//                x: view.frame.width - button.frame.width - 16,
+//                y: view.frame.height - button.frame.height - 20
+//            )
+//        }
 		
 		// setting initial location here since viewWillAppear is too early, and viewDidAppear is too late
 		if !presentedInitialLocation {
